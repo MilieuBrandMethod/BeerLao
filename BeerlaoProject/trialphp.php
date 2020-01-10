@@ -34,28 +34,38 @@ $sqlforinsertingininvaliduser = "INSERT INTO `InvalidUser`(`Code`, `Phoneno`) VA
     $sql="SELECT * FROM `Beerlaotest` WHERE $columntosearchin = '$searchparameter'";
    
     $sqlforcounter="SELECT * FROM `Beerlaotest` ORDER BY `Beerlaotest`.`counter` DESC";
-    
+    $sqlformaxcounter="SELECT counter FROM `Beerlaotest`  ";
 
-   $result = $con ->query($sql);
+
+$result = $con ->query($sql);
 
    if($result-> num_rows >0)
     {  
-        //echo "<table><tr><th>1</th><th>2</th></tr>";
+       
         while($row = $result -> fetch_assoc()){
                 
                $counter=$row["counter"];
               
            if($counter==0)
            {
-               echo "first use of this code";
+               echo "Your details have been succesfully captured";
                echo "\n";
-               $resultforhighestcounter=$con->query($sqlforcounter);
-               if($resultforhighestcounter->num_rows>0)
-               {
-                   while($row2=$resultforhighestcounter->fetch_assoc())
-                   {if($once==true)
-                       {
-                           $highestcounter=$row2["counter"];
+               $result1=$con->query($sqlformaxcounter);
+              if($result1->num_rows>0)
+                {  
+
+                while($row2 = $result1 -> fetch_assoc()){
+                if((int)$row2['counter']>$highestcounter)
+                {
+                     $highestcounter=(int)$row2['counter'];
+                 }
+                 else
+                {
+              
+                }
+                
+              }
+                      // echo $highestcounter;
                        $highestcounter=$highestcounter+1;
                        $sqlforinserting = "UPDATE `Beerlaotest` SET `counter`='$highestcounter' WHERE `Serialno`='$searchparameter'";
                        $resultforinserting=$con->query($sqlforinserting);
@@ -69,12 +79,15 @@ $sqlforinsertingininvaliduser = "INSERT INTO `InvalidUser`(`Code`, `Phoneno`) VA
                                if($highestcounter%200==0)
                                {
                                     $resultfor200 = $con ->query($sqlforinsertingintwohundredwinner);
-                                         echo "200 winner";
+                                         echo "Congratulations! you have won  cash prize \n you will be contacted soon.
+                        ";
                                }
                                else
                                {
                                    $resultfor50 = $con ->query($sqlforinsertinginfiftywinner);
-                                         echo "50 winner";
+                                         echo "Congratulations! you have won  Pepsi prize \n you will be con
+                                         tacted soon.";
+                                         echo "\n";
                                }
                                 
                                
@@ -82,36 +95,33 @@ $sqlforinsertingininvaliduser = "INSERT INTO `InvalidUser`(`Code`, `Phoneno`) VA
                            else
                            {
                                 $resultforld = $con ->query($sqlforinsertinginLuckyDraw);
-                                     echo "Lucky Draw";
+                                     echo "Congratulations! you have entered the lucky draw contest.";
                            }
                            
                            
                             
                            
-                           echo (int)$highestcounter;
+                          // echo (int)$highestcounter;
                             echo "\n";
                        if($resultforinserting->num_rows>0)
                        {
                            
-                               echo "inserted";
+                               //echo "inserted";
                                 echo "\n";
                            
                        }
                        else
                        {
-                           echo "inserted with no rows";
+                           //echo "inserted with no rows";
                             echo "\n";
                        }
-                       }
-                       
-                       
-                   }
+              
                }
            
            }
            else
            {
-               echo "already used";
+               echo "This code has already been used.Try another code.";
            }
           
         }
@@ -123,8 +133,9 @@ $sqlforinsertingininvaliduser = "INSERT INTO `InvalidUser`(`Code`, `Phoneno`) VA
     {
      
         $resultforinvaliduser = $con ->query($sqlforinsertingininvaliduser);
-        //echo "further evaluation";
-    }
+        echo "Sorry! you have entered the wrong code try to zap again with the correct code.";
+  
+  }
   
    
     

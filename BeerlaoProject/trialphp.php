@@ -1,6 +1,4 @@
 
-    
-
     <?php
     $servername="localhost";
     $username="ayushya";
@@ -13,13 +11,17 @@
     $once=true;
     $counter=0;
     $highestcounter;
-  
+    
     if($con ->connect_error)
     {
         die ("connection failed: ".$con -> connect_error);
     }
-     //$sql="SELECT * FROM `tabletest`";
-     //$sqlforcounter="SELECT MAX(counter) FROM `Beerlaotest`";
+     $settransaction="SET SESSION ISOLATION LEVEL SERIALIZABLE";
+     $resultstart=$con->query($settransaction);
+          $maxcounterlock="LOCK TABLES `Beerlaotest` READ ";
+          $transaction="START TRANSACTION";
+     $resultmax=$con->query($maxcounterlock);
+     $resulttrans=$con->query($transaction);
      
     $sqlforinsertingintwohundredwinner = "INSERT INTO `twohundredwinner`(`Code`, `Phoneno`) VALUES ('$searchparameter',$phonenumbergot)";
     
@@ -27,48 +29,44 @@
    
    $sqlforinsertinginLuckyDraw = "INSERT INTO `Luckydraw`(`Code`, `Phoneno`) VALUES ('$searchparameter',$phonenumbergot)";
    
-
-
 $sqlforinsertingininvaliduser = "INSERT INTO `InvalidUser`(`Code`, `Phoneno`) VALUES ('$searchparameter',$phonenumbergot)";
-
     $sql="SELECT * FROM `Beerlaotest` WHERE $columntosearchin = '$searchparameter'";
    
-    $sqlforcounter="SELECT * FROM `Beerlaotest` ORDER BY `Beerlaotest`.`counter` DESC";
+   
     $sqlformaxcounter="SELECT counter FROM `Beerlaotest`  ";
-
-
-$result = $con ->query($sql);
-
+    $result = $con ->query($sql);
    if($result-> num_rows >0)
     {  
        
         while($row = $result -> fetch_assoc()){
                 
                $counter=$row["counter"];
-              
+               $lockleave="UNLOCK TABLES";
+               $resultleave=$con->query($lockleave);
            if($counter==0)
            {
                echo "Your details have been succesfully captured";
                echo "\n";
+
                $result1=$con->query($sqlformaxcounter);
               if($result1->num_rows>0)
                 {  
-
                 while($row2 = $result1 -> fetch_assoc()){
                 if((int)$row2['counter']>$highestcounter)
                 {
                      $highestcounter=(int)$row2['counter'];
                  }
-                 else
-                {
-              
-                }
+               
                 
               }
-                      // echo $highestcounter;
+
+               
+                
                        $highestcounter=$highestcounter+1;
-                       $sqlforinserting = "UPDATE `Beerlaotest` SET `counter`='$highestcounter' WHERE `Serialno`='$searchparameter'";
-                       $resultforinserting=$con->query($sqlforinserting);
+                       $sqlforinserting1 = "SELECT `counter` FROM `Beerlaotest` FOR UPDATE";              
+                       $sqlforinserting2 = "UPDATE `Beerlaotest` SET `counter`='$highestcounter' WHERE `Serialno`='$searchparameter'";
+                       $resultforinserting1=$con->query($sqlforinserting1);
+                       $resultforinserting2=$con->query($sqlforinserting2);
                        
                         echo "\n";
                            $once=false;
@@ -79,8 +77,7 @@ $result = $con ->query($sql);
                                if($highestcounter%200==0)
                                {
                                     $resultfor200 = $con ->query($sqlforinsertingintwohundredwinner);
-                                         echo "Congratulations! you have won  cash prize \n you will be contacted soon.
-                        ";
+                                         echo "Congratulations! you have won  cash prize \n you will be contacted soon.  ";
                                }
                                else
                                {
@@ -101,18 +98,18 @@ $result = $con ->query($sql);
                            
                             
                            
-                          // echo (int)$highestcounter;
+                          
                             echo "\n";
                        if($resultforinserting->num_rows>0)
                        {
                            
-                               //echo "inserted";
+                               
                                 echo "\n";
                            
                        }
                        else
                        {
-                           //echo "inserted with no rows";
+                           
                             echo "\n";
                        }
               
@@ -125,9 +122,7 @@ $result = $con ->query($sql);
            }
           
         }
-        //echo $counter;
-        //echo "</table>";
-    
+
     }
     else
     {
@@ -137,8 +132,8 @@ $result = $con ->query($sql);
   
   }
   
-   
-    
+ 
+ 
     
     $con->close();
     ?>
